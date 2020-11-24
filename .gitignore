@@ -1,0 +1,6 @@
+/.settings
+/bin
+*.class
+/data/keypair
+/data/utxo
+*.yml
