@@ -72,7 +72,14 @@ class Node {
 
 			} else {
 				try {
-					final Obj txOrBlockOrMsg = new Obj(Util.deserializeString(channel.array()));
+					final String str = Util.deserializeString(channel.array());
+					if (str != null && str.length() > 10) {
+						Util.p("INFO: net data: " + str.substring(0, 10));
+					} else {
+						Util.p("ERROR: String too small: " + str);
+					}
+
+					final Obj txOrBlockOrMsg = new Obj(str);
 					channel.clear();
 
 					if (txOrBlockOrMsg.has("lastBlockHash")) { // block
