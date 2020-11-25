@@ -345,7 +345,7 @@ public abstract class DUtil {
 	static void giveMeABlockMessage(final SocketChannelWrapper channel, final String blockHash, final boolean next)
 			throws IOException {
 		final long now = System.currentTimeMillis();
-		if ((now - channel.lastTimeWrite) / 1000 < 20) {
+		if ((now - channel.lastTimeWrite) / 1000 > 20) {
 			final Obj giveMeABlockMessage = new Obj();
 			giveMeABlockMessage.put("blockHash", blockHash);
 			giveMeABlockMessage.put("next", next);
