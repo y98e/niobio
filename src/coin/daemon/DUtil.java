@@ -344,10 +344,13 @@ public abstract class DUtil {
 
 	static void giveMeABlockMessage(final SocketChannelWrapper channel, final String blockHash, final boolean next)
 			throws IOException {
-		final Obj giveMeABlockMessage = new Obj();
-		giveMeABlockMessage.put("blockHash", blockHash);
-		giveMeABlockMessage.put("next", next);
-		channel.send(giveMeABlockMessage);
+		final long now = System.currentTimeMillis();
+		if ((now - channel.lastTimeWrite) / 1000 < 20) {
+			final Obj giveMeABlockMessage = new Obj();
+			giveMeABlockMessage.put("blockHash", blockHash);
+			giveMeABlockMessage.put("next", next);
+			channel.send(giveMeABlockMessage);
+		}
 	}
 
 	static boolean isGenesisBlock(final Obj block) throws IOException {
