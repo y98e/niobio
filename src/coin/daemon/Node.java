@@ -133,6 +133,7 @@ class Node {
 							Util.p("INFO: block response");
 							channel.send(b);
 						}
+
 					} else if (txOrBlockOrMsg.has("id")) { // detect self connection
 						final long nodeId = txOrBlockOrMsg.getLong("id");
 						if (id == nodeId) {
@@ -390,9 +391,7 @@ class Node {
 	}
 
 	void sendAll(final Obj json) {
-
 		for (final SocketChannelWrapper s : p2pChannels) s.send(json);
-
 	}
 
 	boolean shouldIDoSomethingNow() throws Exception {

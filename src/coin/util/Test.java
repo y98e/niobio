@@ -32,22 +32,22 @@ public abstract class Test {
 			}
 		}).start();
 
-		for (;;) {
-			final int idxFrom = Util.random.nextInt(qty);
-			final String from = pubkeys[idxFrom];
-
-			final int idxTo = Util.random.nextInt(qty);
-			final String to = pubkeys[idxTo];
-
-			final long balance = RPC.getBalance(from);
-
-			if (balance > 0) {
-				final long amount = balance - Util.random.nextInt((int) balance);
-				RPC.send(from, to, amount);
-			} else {
-				Thread.sleep(100);
-			}
-		}
+//		for (;;) {
+//			final int idxFrom = Util.random.nextInt(qty);
+//			final String from = pubkeys[idxFrom];
+//
+//			final int idxTo = Util.random.nextInt(qty);
+//			final String to = pubkeys[idxTo];
+//
+//			final long balance = RPC.getBalance(from);
+//
+//			if (balance > 0) {
+//				final long amount = balance - Util.random.nextInt((int) balance);
+//				RPC.send(from, to, amount);
+//			} else {
+//				Thread.sleep(100);
+//			}
+//		}
 	}
 
 	public static void main1(final String[] args) throws Exception {
