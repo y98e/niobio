@@ -74,7 +74,8 @@ class Node {
 				try {
 					final String str = Util.deserializeString(channel.array());
 					if (str != null && str.length() > 10) {
-						Util.p("INFO: net data: " + str.substring(0, 10));
+						Util.p("INFO: net data: " + str.substring(0, 10) + ".."
+								+ str.substring(str.length() - 10, str.length()));
 					} else {
 						Util.p("ERROR: String too small: " + str);
 					}
@@ -143,9 +144,9 @@ class Node {
 						disconnect = true;
 					}
 				} catch (final StreamCorruptedException | JSONException e) {
-					e.printStackTrace();
+					// e.printStackTrace();
 					channel.errorCount++;
-					if (channel.errorCount > 3) channel.clear();
+					if (channel.errorCount > 10) channel.clear();
 					Util.p("WARN: is data not ready? " + readedBytes + " bytes: " + channel);
 
 				} catch (ClassNotFoundException | IOException | InterruptedException e) {
