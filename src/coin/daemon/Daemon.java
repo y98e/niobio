@@ -146,6 +146,7 @@ public abstract class Daemon {
 		Thread.currentThread().setName("RPC Daemon " + Util.random.nextInt(100));
 
 		Obj json = Util.inputStreamToJSON(exchange.getRequestBody());
+		Obj blockOrTX = null;
 
 		Util.p("INFO: new request " + json);
 
@@ -189,14 +190,16 @@ public abstract class Daemon {
 
 			} else if (json.has("lastBlockHash")) { // block
 				sendToNetwork = blockchain.addBlock(json, null);
+				blockOrTX = json;
 				json = new Obj("{\"status\":\"" + sendToNetwork + "\"}");
 
 			} else if (json.has("sig")) { // tx
 				sendToNetwork = node.addTxToMemPool(json);
+				blockOrTX = json;
 				json = new Obj("{\"status\":\"" + sendToNetwork + "\"}");
 			}
 
-			if (sendToNetwork) node.sendAll(json);
+			if (sendToNetwork) node.sendAll(blockOrTX);
 
 		}
 

@@ -147,7 +147,7 @@ class Node {
 				} catch (final StreamCorruptedException | JSONException e) {
 					// e.printStackTrace();
 					channel.errorCount++;
-					if (channel.errorCount > 10) channel.clear();
+					if (channel.errorCount > 5) channel.clear();
 					Util.p("WARN: is data not ready? " + readedBytes + " bytes: " + channel);
 
 				} catch (ClassNotFoundException | IOException | InterruptedException e) {

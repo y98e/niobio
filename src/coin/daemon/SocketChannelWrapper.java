@@ -18,7 +18,6 @@ public class SocketChannelWrapper {
 	int errorCount = 0;
 	public int unknownBlockCount = 0;
 	private final LinkedList<Obj> toSend = new LinkedList<Obj>(); // TODO sync?
-	public long lastTimeWrite = System.currentTimeMillis();
 
 	public SocketChannelWrapper(final SocketChannel socketChannel, final int capacity) {
 		this.socketChannel = socketChannel;
@@ -80,7 +79,6 @@ public class SocketChannelWrapper {
 		final Obj m = toSend.removeFirst();
 
 		Util.p("INFO: WRITE request " + this);
-		lastTimeWrite = System.currentTimeMillis();
 		final byte[] bytes = Util.serialize(m);
 		if (bytes.length > 50_000) socketChannel.configureBlocking(true);
 		final int wrote = socketChannel.write(ByteBuffer.wrap(bytes));
