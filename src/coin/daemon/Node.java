@@ -72,7 +72,8 @@ class Node {
 
 			} else {
 				try {
-					final String str = Util.deserializeString(channel.array());
+					String str = Util.deserializeString(channel.array());
+					str = str.trim();
 					if (str != null && str.length() > 10) {
 						Util.p("INFO: net data: " + str.substring(0, 10) + ".."
 								+ str.substring(str.length() - 10, str.length()));
