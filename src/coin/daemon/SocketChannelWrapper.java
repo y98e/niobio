@@ -81,7 +81,12 @@ public class SocketChannelWrapper {
 
 		Util.p("INFO: WRITE request " + this);
 		lastTimeWrite = System.currentTimeMillis();
-		return socketChannel.write(ByteBuffer.wrap(Util.serialize(m)));
+		final byte[] bytes = Util.serialize(m);
+		if (bytes.length > 50_000) socketChannel.configureBlocking(true);
+		final int wrote = socketChannel.write(ByteBuffer.wrap(bytes));
+		socketChannel.configureBlocking(false);
+		Util.p("INFO: WROTE " + wrote + " bytes. bytes.length = " + bytes.length);
+		return wrote;
 	}
 
 	public void send(final Obj msg) {

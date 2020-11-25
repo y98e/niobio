@@ -85,8 +85,11 @@ class Blockchain {
 		if (DUtil.isGenesisBlock(block)) {
 			chain = bestChain;
 		} else {
-			chain = Util
-					.loadObjFromFile(Util.conf.getString("folderUTXO") + block.getString("lastBlockHash") + ".json");
+			try {
+				chain = Util.loadObjFromFile(
+						Util.conf.getString("folderUTXO") + block.getString("lastBlockHash") + ".json");
+			} catch (final java.nio.file.NoSuchFileException e) {
+			}
 		}
 
 		// if we know the chain of this block
