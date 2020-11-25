@@ -135,7 +135,7 @@ class Node {
 					} else {
 						disconnect = true;
 					}
-				} catch (final StreamCorruptedException e) {
+				} catch (final StreamCorruptedException | JSONException e) {
 					e.printStackTrace();
 					channel.errorCount++;
 					if (channel.errorCount > 3) channel.clear();
