@@ -7,4 +7,6 @@ module niobio {
 
 	requires transitive jdk.httpserver;
 	requires org.bouncycastle.provider;
+	requires java.sql;
+	requires org.postgresql.jdbc;
 }
