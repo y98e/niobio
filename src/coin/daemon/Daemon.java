@@ -18,6 +18,16 @@ public abstract class Daemon {
 		Thread.currentThread().setName("Daemon");
 		Util.p("INFO: Starting Daemon");
 
+		// start explorer
+		final Thread explorer = new Thread(() -> {
+			try {
+				Explorer.main(null);
+			} catch (final Exception e) {
+				Util.p(e.getMessage());
+			}
+		});
+		explorer.start();
+
 		// load blockchain
 		blockchain = new Blockchain();
 
@@ -91,11 +101,6 @@ public abstract class Daemon {
 				r.put("mempool", "Tx received. Waiting to be mined.");
 				break;
 			}
-		}
-
-		if (blockchain.userToStatements.has(pubkey)) {
-			final Arr statements = blockchain.userToStatements.getArr(pubkey);
-			r.put("statements", statements);
 		}
 
 		return r;
@@ -186,6 +191,13 @@ public abstract class Daemon {
 					json = circulatingSupply();
 					break;
 
+				case "getBlock":
+					json = RPC.toExplorer(json);
+					break;
+
+				case "getTransaction":
+					json = RPC.toExplorer(json);
+					break;
 				}
 
 			} else if (json.has("lastBlockHash")) { // block

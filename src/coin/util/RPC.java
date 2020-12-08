@@ -32,6 +32,10 @@ public abstract class RPC {
 		return Util.postRPC("http://localhost:" + Util.conf.getInt("daemonRPC"), o);
 	}
 
+	public static Obj toExplorer(final Obj o) {
+		return Util.postRPC("http://localhost:" + Util.conf.getInt("explorerRPC"), o);
+	}
+
 	public static Obj toMiner(final Obj o) {
 		return Util.postRPC("http://localhost:" + Util.conf.getInt("minerRPC"), o);
 	}

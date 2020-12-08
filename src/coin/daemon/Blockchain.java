@@ -13,11 +13,6 @@ class Blockchain {
 
 	Obj bestChain;
 
-	// last5 is data just to keep lastest transactions in memory.
-	// so user can check the status of last transactions that he made
-	private final LinkedList<Obj> last5Blocks = new LinkedList<Obj>();
-	Obj userToStatements = new Obj();
-
 	// first time? create genesis block. otherwise load snapshot and read a few blocks after that to create UTXOs
 	Blockchain() throws Exception {
 
@@ -182,8 +177,6 @@ class Blockchain {
 									+ blockHash);
 							bestChain = newChain;
 
-							update5Blocks(block);
-
 							// tell the miner about this new best chain to mine
 							if (persistBlock && !DUtil.isGenesisBlock(block)) {
 								final Obj blockTemplate = Daemon.getBlockTemplate();
@@ -191,6 +184,11 @@ class Blockchain {
 									Thread.currentThread().setName("Blockchain " + Util.random.nextInt(100));
 									Util.p("INFO: Daemon to Miner (sending blockTemplate) " + blockTemplate);
 									RPC.toMiner(blockTemplate);
+								}).start();
+								new Thread(() -> {
+									Thread.currentThread().setName("Blockchain " + Util.random.nextInt(100));
+									Util.p("INFO: Daemon to Explorer");
+									RPC.toExplorer(block);
 								}).start();
 							}
 
@@ -230,145 +228,6 @@ class Blockchain {
 
 	public boolean addChain(final Obj block) throws Exception {
 		return addBlock(block, false, true, null);
-	}
-
-	private void update5Blocks(final Obj block) throws ClassNotFoundException, JSONException, IOException {
-
-		if (last5Blocks.size() == 5) {
-			final Obj oldLastBlock = DUtil.getBlock(block.getString("lastBlockHash"));
-
-			if (last5Blocks.get(4).equals(oldLastBlock)) {
-				last5Blocks.add(block);
-				if (last5Blocks.size() > 5) last5Blocks.removeFirst();
-			} else {
-				// re-create last5Blocks
-				last5Blocks.clear();
-				final Obj block4 = oldLastBlock;
-				final Obj block3 = DUtil.getBlock(block4.getString("lastBlockHash"));
-				final Obj block2 = DUtil.getBlock(block3.getString("lastBlockHash"));
-				final Obj block1 = DUtil.getBlock(block2.getString("lastBlockHash"));
-				last5Blocks.add(block1);
-				last5Blocks.add(block2);
-				last5Blocks.add(block3);
-				last5Blocks.add(block4);
-				last5Blocks.add(block);
-			}
-		} else {
-			last5Blocks.add(block);
-		}
-
-		// re-create userToStatements
-
-		// load alltxs and allusers
-		final Map<String, Obj> alltxs = new HashMap<String, Obj>();
-		final List<String> allusers = new ArrayList<String>();
-		for (final Obj b : last5Blocks) {
-			final Arr txs = b.getArr("txs");
-			for (int i = 0; i < txs.length(); i++) {
-				final Obj tx = txs.getObj(i);
-				alltxs.put(Crypto.sha(tx), tx);
-				final Arr outputs = tx.getArr("outputs");
-				for (int j = 0; j < outputs.length(); j++) {
-					final Obj out = outputs.getObj(j);
-					final String pubkey = out.getString("pubkey");
-					if (!allusers.contains(pubkey)) allusers.add(pubkey);
-				}
-			}
-		}
-
-		// load spent outputs (inputs) and unspent outputs (not yet inputs) for each user
-		final Map<String, Arr> userLess = new HashMap<String, Arr>();
-		final Map<String, Arr> userMore = new HashMap<String, Arr>();
-		for (final Obj b : last5Blocks) {
-			final String sha = Crypto.sha(b);
-			final Arr txs = b.getArr("txs");
-			for (int i = 0; i < txs.length(); i++) {
-				final Obj tx = txs.getObj(i);
-				if (tx.has("inputs")) {
-					final Arr inputs = tx.getArr("inputs");
-					// spent outputs
-					for (int j = 0; j < inputs.length(); j++) {
-						final Obj in = inputs.getObj(j);
-						final String txHash = in.getString("txHash");
-						if (alltxs.containsKey(txHash)) {
-							final Obj oldTx = alltxs.get(txHash);
-							final Arr outputs = oldTx.getArr("outputs");
-							final Obj oldOut = outputs.getObj(in.getInt("outIdx"));
-							final String pubkey = oldOut.getString("pubkey");
-							Arr less = userLess.get(pubkey);
-							if (less == null) less = new Arr();
-							final Obj o = new Obj(oldOut.toString());
-							o.remove("pubkey");
-							o.put("blockHash", sha);
-							less.put(o);
-							userLess.put(pubkey, less);
-						}
-					}
-				}
-				// unspent outputs
-				final Arr outputs = tx.getArr("outputs");
-				for (int j = 0; j < outputs.length(); j++) {
-					final Obj out = outputs.getObj(j);
-					final String pubkey = out.getString("pubkey");
-					Arr more = userMore.get(pubkey);
-					if (more == null) more = new Arr();
-					final Obj o = new Obj(out.toString());
-					o.remove("pubkey");
-					o.put("blockHash", sha);
-					if (tx.has("inputs")) {
-						o.put("outputs", outputs);
-					}
-					more.put(o);
-					userMore.put(pubkey, more);
-				}
-			}
-		}
-
-		userToStatements = new Obj();
-
-		for (final String u : allusers) {
-
-			final Arr more = userMore.get(u);
-			final Arr less = userLess.get(u);
-
-			final Arr diff = new Arr();
-			if (more != null) {
-				for (int i = 0; i < more.length(); i++) {
-					final Obj out = more.getObj(i);
-					out.put("amount", "+" + out.getLong("amount"));
-					diff.put(out);
-				}
-			}
-
-			if (less != null) {
-				for (int i = 0; i < less.length(); i++) {
-					final Obj out = less.getObj(i);
-					out.put("amount", "-" + out.getLong("amount"));
-					diff.put(out);
-				}
-			}
-
-			final List<Integer> toRemove = new ArrayList<Integer>();
-			for (int i = 0; i < diff.length(); i++) {
-				for (int j = 0; j < diff.length(); j++) {
-					if (i == j || toRemove.contains(i)) continue;
-					final Obj oi = diff.getObj(i);
-					final Obj oj = diff.getObj(j);
-					if (oi.getString("blockHash").equals(oj.getString("blockHash"))) {
-						oi.put("amount", oj.getString("amount") + oi.getString("amount"));
-						toRemove.add(j);
-					}
-				}
-			}
-
-			Collections.sort(toRemove, Collections.reverseOrder());
-			for (final int i : toRemove) {
-				diff.remove(i);
-			}
-
-			userToStatements.put(u, diff);
-		}
-
 	}
 
 }

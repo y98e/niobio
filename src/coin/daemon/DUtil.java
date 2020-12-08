@@ -39,6 +39,13 @@ public abstract class DUtil {
 		}
 	}
 
+	public static String getBlockFileName(final long height, final int i) {
+		String folder = null;
+		if (height == 0) folder = "";
+		else folder = String.format("%012d", (((height - 1) / 10000) * 10000 + 1)) + "/";
+		return Util.conf.getString("folderBlocks") + folder + String.format("%012d", height) + "_" + i + ".json";
+	}
+
 	// input = txHash, outIdx
 	private static boolean checkInputFormat(final Obj in) {
 		final String[] keys = Obj.getNames(in);
@@ -288,13 +295,6 @@ public abstract class DUtil {
 			} else break;
 		}
 		return null;
-	}
-
-	static String getBlockFileName(final long height, final int i) {
-		String folder = null;
-		if (height == 0) folder = "";
-		else folder = String.format("%012d", (((height - 1) / 10000) * 10000 + 1)) + "/";
-		return Util.conf.getString("folderBlocks") + folder + String.format("%012d", height) + "_" + i + ".json";
 	}
 
 	static Obj getNextBlock(final String blockHash) throws ClassNotFoundException, IOException {
