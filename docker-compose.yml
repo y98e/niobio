@@ -2,6 +2,19 @@ version: '3'
 
 services:
   postgres-compose:
+    image: all
+    ports:
+      - "10762:10762"
+      - "80:8080"
+      - "8081:8081"
+      - "8082:8082"
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data 
+      - ./data:/niobio/data
+    networks:
+      - postgres-compose-network
+
+  postgres-compose:
     image: postgres
     environment:
       POSTGRES_PASSWORD: "Postgres2020!"
