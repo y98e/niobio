@@ -2,7 +2,7 @@ version: '3'
 
 services:
   postgres-compose:
-    image: all
+    image: niobio
     ports:
       - "10762:10762"
       - "80:8080"
