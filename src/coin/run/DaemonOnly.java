@@ -17,7 +17,7 @@ public abstract class DaemonOnly {
 			});
 			daemon.start();
 
-			Thread.sleep(15000);
+			Thread.sleep(30_000);
 		} catch (final Exception e) {
 			e.printStackTrace();
 			System.exit(0);

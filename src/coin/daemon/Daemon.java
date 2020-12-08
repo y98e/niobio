@@ -18,6 +18,11 @@ public abstract class Daemon {
 		Thread.currentThread().setName("Daemon");
 		Util.p("INFO: Starting Daemon");
 
+		Process p = Util.exec("docker-compose down");
+		p.waitFor();
+		p = Util.exec("docker-compose up -d");
+		p.waitFor();
+
 		// start explorer
 		final Thread explorer = new Thread(() -> {
 			try {

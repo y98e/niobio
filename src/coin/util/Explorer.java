@@ -24,6 +24,7 @@ public class Explorer {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 		} catch (final SQLException e) {
+			e.printStackTrace();
 			// throw new RuntimeException(e.getMessage());
 		}
 	}
