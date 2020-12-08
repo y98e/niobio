@@ -3,3 +3,4 @@
 *.class
 /data/keypair
 /data/utxo
+/data/pg
