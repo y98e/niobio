@@ -1,13 +1,15 @@
 version: '3'
 
 services:
-  postgres-compose:
+  niobio-compose:
     image: niobio
     ports:
       - "10762:10762"
       - "80:8080"
       - "8081:8081"
       - "8082:8082"
+    depends_on:
+      - pgadmin-compose
     volumes:
       - ./data/pg:/var/lib/postgresql/data 
       - ./data:/niobio/data
