@@ -143,6 +143,18 @@ docker-compose up
 curl --header "Content-Type: application/json" --request POST --data '{"method":"getBalance", "pubkey":"PUBLIC_KEY"}' http://localhost:8080
 ```
 
+**getBlock** HASH
+
+```
+curl --header "Content-Type: application/json" --request POST --data '{"method":"getBlock", "hash":"HASH"}' http://localhost:8080
+```
+
+**getTransaction** HASH
+
+```
+curl --header "Content-Type: application/json" --request POST --data '{"method":"getTransaction", "hash":"HASH"}' http://localhost:8080
+```
+
 **getBestChain**
 
 ```
