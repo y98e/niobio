@@ -14,7 +14,7 @@ import coin.daemon.*;
 
 public class Explorer {
 
-	private static final String url = "jdbc:postgresql://localhost:15432/niobio";
+	private static final String url = "jdbc:postgresql://postgres-compose:5432/niobio";
 	private static final String user = "postgres";
 	private static final String password = "Postgres2020!";
 
