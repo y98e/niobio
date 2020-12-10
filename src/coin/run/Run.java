@@ -4,6 +4,7 @@ import coin.util.*;
 
 public class Run {
 
+	// git update and run it again
 	public static void run(final String run) {
 		while (true) {
 			try {
