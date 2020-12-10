@@ -125,6 +125,12 @@ docker ps
 docker stop CONTAINER_ID
 ```
 
+## Run Block Explorer
+
+```
+docker-compose up
+```
+
 ## API (RPC)
 
 *INFO: "Public Key" and "Address" are the same thing here.*
