@@ -83,48 +83,37 @@ git clone https://github.com/niobio-cash/niobio.git
 cd niobio/
 ```
 
-**1- To create a new wallet (daemon + wallet)**
-
-1.1- Build program and then start daemon (localhost:8080) and wallet rpc (localhost:8081)
+**1- Run Daemon**
 
 ```
-docker build --build-arg RUN=coin.run.RunDaemonWallet -t wallet .
-docker run -it -p 10762:10762 -p 8080:8080 -p 8081:8081 -v "${PWD}/data:/niobio/data" --rm wallet
+docker build --build-arg RUN=coin.run.RunDaemon -t daemon .
+docker run -it -p 10762:10762 -p 8080:8080 -v "${PWD}/data:/niobio/data" --rm daemon
 ```
 
-1.2- Create a new keypair (Public Key + Private Key)
+**2- Run Wallet**
+
+```
+docker build --build-arg RUN=coin.run.RunWallet -t wallet .
+docker run -it -p 8081:8081 -v "${PWD}/data:/niobio/data" --rm wallet
+```
+
+**2- Run Miner (check YOUR_ADDRESS)**
+
+```
+docker build --build-arg RUN=coin.run.RunMiner --build-arg PARAM=YOUR_ADDRESS -t miner .
+docker run -it -p 8082:8082 -v "${PWD}/data:/niobio/data" --rm miner
+```
+
+## Create a new keypair (Public Key + Private Key)
 
 ```
 curl --header "Content-Type: application/json" --request POST --data '{"method":"createKey"}' http://localhost:8081
 ```
 
-1.3- Check path *niobio/data/keypair* to see if your new key is there. Filename is your address (public key)
+Check path *niobio/data/keypair* to see if your new key is there. Filename is your address (public key)
 
 ```
 ls -l niobio/data/keypair/
-```
-
-1.4- Stop (to mine, you need stop this. Check step 3). **Ctrl + C**
-
-**2- To mine, you MUST change YOUR_ADDRESS (public key) below to build and then run (daemon + miner)**
-
-```
-docker build --build-arg RUN=coin.run.RunDaemonMiner --build-arg PARAM=YOUR_ADDRESS -t miner .
-docker run -it -p 10762:10762 -p 8080:8080 -v "${PWD}/data:/niobio/data" --rm miner
-```
-
-**3- To run all (daemon + wallet + miner)**
-
-```
-docker build --build-arg RUN=coin.run.RunDaemonWalletMiner --build-arg PARAM=YOUR_ADDRESS -t all .
-docker run -it -p 10762:10762 -p 8080:8080 -p 8081:8081 -p 8082:8082 -v "${PWD}/data:/niobio/data" --rm all
-```
-
-**4- Run daemon only (Why? Are you sure?)**
-
-```
-docker build --build-arg RUN=coin.run.RunDaemon -t daemon .
-docker run -it -p 10762:10762 -p 8080:8080 -v "${PWD}/data:/niobio/data" --rm daemon
 ```
 
 That's it! :-D

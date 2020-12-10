@@ -9,9 +9,6 @@ public class Run {
 			try {
 				Process p = null;
 
-//				p = Util.exec("git fetch origin");
-//				p.waitFor();
-
 				p = Util.exec("git reset --hard origin/master");
 				p.waitFor();
 
